@@ -4,16 +4,13 @@ import javax.swing.JFrame;
 import javax.swing.JButton;
 import javax.swing.JTable;
 
-import Entities.Order;
-
+import Entities.Film;
 import javax.swing.JLabel;
 import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.List;
 import java.awt.event.ActionEvent;
 
@@ -22,6 +19,7 @@ public class MainWindow {
 	private JFrame frmFilmprojectMain;
 	private JTable table;
 
+	private IConnectService stub;
 	/**
 	 * Launch the application.
 	 */
@@ -48,20 +46,23 @@ public class MainWindow {
 
 	
 	public void GetRmiConnect()	{
-		Registry registry;
+		
 		try {
-			registry = LocateRegistry.getRegistry("127.0.0.1");
-			IConnectService stub = (IConnectService) Naming.lookup("ConnectService");
-	        String[] response = stub.GetFilmsList();
-	        System.out.println("response:");
-	        for (String item :response){
-	        	System.out.println(item);
-	        }
+			stub = (IConnectService) Naming.lookup("ConnectService");
+	        boolean response = stub.GetStatusConnect();
+	        if (response)
+	        	System.out.println("Connect with interface was successfull!");
 	        
-	        List<Order> o = stub.GetOrders();
-	        
-	        System.out.println(o.get(0).getFilmId());
-	        
+	        List<Film> filmList = stub.GetFilmsList();
+	        if (filmList!=null)
+		        for (Film film : filmList){
+		        	System.out.println(film.getFilmId());
+		        	System.out.println(film.getName());
+		        	System.out.println(film.getRating());
+		        	System.out.println(film.getRentCost());
+		        	System.out.println(film.getYear());
+		        }
+
 		} catch (RemoteException | NotBoundException | MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -75,9 +76,9 @@ public class MainWindow {
 	private void initialize() {
 		frmFilmprojectMain = new JFrame();
 		frmFilmprojectMain.setTitle("FilmProject - Main Form");
-		frmFilmprojectMain.setBounds(100, 100, 708, 424);
+		frmFilmprojectMain.setBounds(100, 100, 696, 424);
 		frmFilmprojectMain.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
+		frmFilmprojectMain.setResizable(false);
 		frmFilmprojectMain.getContentPane().setLayout(null);
 		
 		JButton btnAssortment = new JButton("Assortment");

@@ -44,6 +44,7 @@ public class CreateOrderDialog extends JDialog {
 		contentPanel.setLayout(null);
 
 		setModal(true);
+		setResizable(false);
 		
 		JLabel label = new JLabel("Choose the film");
 		label.setBounds(43, 14, 122, 14);
