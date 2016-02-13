@@ -14,22 +14,22 @@ public class Order implements Serializable{
 	private int _customerId;
 	private int _employeeId;
 	private Date _created;
-	private Date _rentStartDate;
 	private Date _rentExpires;
+	private String _phoneNumber;
+	
+
 	private boolean _returned;
-	private double _totalAmount;
 	
 	public Order(ResultSet rs) throws SQLException{
 		
 		_orderId = rs.getInt("OrderId");
 		_filmId = rs.getInt("FilmId");
+		_phoneNumber = rs.getString("PhoneNumber");
 		_customerId = rs.getInt("CustomerId");
 		_employeeId = rs.getInt("EmployeeId");
 		_created = rs.getDate("Created");
-		_rentStartDate = rs.getDate("RentStartDate");
 		_rentExpires = rs.getDate("RentExpires");
 		_returned = rs.getBoolean("Returned");
-		_totalAmount = rs.getFloat("TotalAmount");
 	}
 
 	public Order() {
@@ -68,14 +68,6 @@ public class Order implements Serializable{
 		_created = created;
 	}
 
-	public Date getRentStartDate() {
-		return _rentStartDate;
-	}
-
-	public void setRentStartDate(Date rentFrom) {
-		_rentStartDate = rentFrom;
-	}
-
 	public Date getRentExpires() {
 		return _rentExpires;
 	}
@@ -100,12 +92,12 @@ public class Order implements Serializable{
 		_returned = returned;
 	}
 
-	public double getTotalAmount() {
-		return _totalAmount;
+	public String get_phoneNumber() {
+		return _phoneNumber;
 	}
 
-	public void setTotalAmount(double totalAmount) {
-		_totalAmount = totalAmount;
+	public void set_phoneNumber(String _phoneNumber) {
+		this._phoneNumber = _phoneNumber;
 	}
 
 }

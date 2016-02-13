@@ -17,22 +17,6 @@ public class FilmListForm {
 	private JTable table;
 
 	/**
-	 * Launch the application.
-	 */
-	/*public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					FilmListForm window = new FilmListForm();
-					window.frmFilmsList.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}*/
-
-	/**
 	 * Create the application.
 	 */
 	public FilmListForm() {
@@ -56,6 +40,8 @@ public class FilmListForm {
 		gridBagLayout.rowWeights = new double[]{1.0, Double.MIN_VALUE};
 		frmFilmsList.getContentPane().setLayout(gridBagLayout);
 		//frmFilmsList.setVisible(true);
+		
+
 		
 		table = new JTable();
 		GridBagConstraints gbc_table = new GridBagConstraints();
