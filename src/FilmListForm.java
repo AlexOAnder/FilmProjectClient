@@ -4,18 +4,22 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JLabel;
 import javax.swing.JTable;
+
+import Entities.Film;
+
 import java.awt.GridBagLayout;
+import java.util.List;
 import java.awt.GridBagConstraints;
 
 public class FilmListForm {
 
-	private JFrame frmFilmsList;
+	public JFrame frmFilmsList;
 	private JTable table;
 
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -26,7 +30,7 @@ public class FilmListForm {
 				}
 			}
 		});
-	}
+	}*/
 
 	/**
 	 * Create the application.
@@ -35,20 +39,23 @@ public class FilmListForm {
 		initialize();
 	}
 
-	/**
+	public FilmListForm(List<Film> filmList){
+		initialize();
+	}	/**
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
 		frmFilmsList = new JFrame();
 		frmFilmsList.setTitle("Films List");
-		frmFilmsList.setBounds(100, 100, 730, 479);
-		frmFilmsList.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmFilmsList.setBounds(100, 100, 503, 479);
+		frmFilmsList.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 0};
 		gridBagLayout.rowHeights = new int[]{0, 0};
 		gridBagLayout.columnWeights = new double[]{1.0, Double.MIN_VALUE};
 		gridBagLayout.rowWeights = new double[]{1.0, Double.MIN_VALUE};
 		frmFilmsList.getContentPane().setLayout(gridBagLayout);
+		//frmFilmsList.setVisible(true);
 		
 		table = new JTable();
 		GridBagConstraints gbc_table = new GridBagConstraints();
