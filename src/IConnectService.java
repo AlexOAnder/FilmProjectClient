@@ -19,4 +19,6 @@ public interface IConnectService extends Remote{
 	void AddNewCustomOrderView(CustomOrderView order) throws RemoteException;
 	
 	void UpdateOrderStatus(int orderId) throws RemoteException;
+	
+	boolean IdentificationAccess(String name,String pass) throws RemoteException;
 }

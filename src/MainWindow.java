@@ -4,12 +4,14 @@ import java.awt.JobAttributes.DialogType;
 import javax.swing.JFrame;
 import javax.swing.JButton;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
 import Entities.CustomOrderView;
 import Entities.Film;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 
 import java.awt.event.ActionListener;
@@ -61,15 +63,54 @@ public class MainWindow {
 		});
 	}
 
+	private void SmallLoginDialog()
+	{
+		JTextField username = new JTextField();
+		JTextField password = new JPasswordField();
+		Object[] message = {
+		    "Username:", username,
+		    "Password:", password
+		};
+
+		for (int i=0;;){
+			int option = JOptionPane.showConfirmDialog(null, message, "Login", JOptionPane.OK_CANCEL_OPTION);
+			if (option == JOptionPane.OK_OPTION) {
+				if (GetAuthorizeAssess(username.getText(),password.getText())){
+					JOptionPane.showMessageDialog(null,"Login successful!");
+			        break;
+			    } else {
+			    	JOptionPane.showMessageDialog(null,"Login failed! Try again");
+			    }
+			} else {
+				JOptionPane.showMessageDialog(null,"Login canceled! Programm will be closed");
+			    System.exit(0);
+			}
+		}		
+	}
+	
 	/**
 	 * Create the application.
 	 */
 	public MainWindow() {
 		GetRmiConnect();
+		SmallLoginDialog();
 		initialize();
-
 	}
 
+	public boolean GetAuthorizeAssess(String user,String pass)
+	{
+		try {
+			if(stub.GetStatusConnect())	
+				return stub.IdentificationAccess(user,pass);
+			return false;
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "RMI предал нас! Авторизация не удалась",
+					"Connect failed",JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+	}
+	
 	public void LoadData() throws RemoteException {
 		// load main customOrderView for main frame
 		List<CustomOrderView> mainList = stub.GetCustomOrderViewList();
