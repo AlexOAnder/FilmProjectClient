@@ -11,14 +11,10 @@ public interface IConnectService extends Remote{
 	public List<Order> GetOrders() throws RemoteException;
 			
 	public List<Film> GetFilmsList() throws RemoteException;
-	
-	public void AddNewOrder(Order order) throws RemoteException;
-	
-	public void UpdateOrderStatusById(int id,int status) throws RemoteException;
-	
+		
 	public boolean GetStatusConnect() throws RemoteException;
 	
-	public List<CustomOrderView> GetCustomOrderView() throws RemoteException;
+	public List<CustomOrderView> GetCustomOrderViewList() throws RemoteException;
 	
 	void AddNewCustomOrderView(CustomOrderView order) throws RemoteException;
 }

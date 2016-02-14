@@ -73,7 +73,7 @@ public class MainWindow {
 		        	System.out.println("Connect with interface was successfull!");
 
 		        // load main customOrderView for main frame
-		        List<CustomOrderView> mainList = stub.GetCustomOrderView();
+		        List<CustomOrderView> mainList = stub.GetCustomOrderViewList();
 		        if (mainList ==null) {
 		        	JOptionPane.showMessageDialog(null, "RMI предал нас! Нет данных для главной формы");
 		        	frmFilmprojectMain.dispose();
@@ -93,6 +93,7 @@ public class MainWindow {
 		} catch (MalformedURLException | RemoteException | NotBoundException e) {
 			JOptionPane.showMessageDialog(null, "Все плохо!RMI отказался дружить с нами");
 			e.printStackTrace();
+			frmFilmprojectMain.dispose();
 			System.exit(0);
 		}
 		

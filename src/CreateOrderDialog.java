@@ -11,6 +11,7 @@ import Entities.CustomOrderView;
 import Entities.Film;
 
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Dictionary;
@@ -25,13 +26,15 @@ import java.awt.HeadlessException;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
+import java.awt.event.InputMethodListener;
+import java.awt.event.InputMethodEvent;
 
 public class CreateOrderDialog {
 
 	private JFrame frmCreateOrder;
 	private final JPanel contentPanel = new JPanel();
 	private JTextField tf_rentDays;
-	private JComboBox<String> filmComboBox;
+	public JComboBox<String> filmComboBox;
 	private JTextField tf_firstName;
 	private JTextField tf_lastName;
 	private JTextField tf_passportNumber;
@@ -64,31 +67,49 @@ public class CreateOrderDialog {
 		filmComboBox.setBounds(175, 11, 192, 20);
 		contentPanel.add(filmComboBox);
 
+		JLabel lbl_Payment = new JLabel("0");
+		lbl_Payment.setFont(new Font("Tahoma", Font.BOLD, 17));
+		lbl_Payment.setBounds(180, 283, 192, 23);
+		contentPanel.add(lbl_Payment);
+		
 		tf_rentDays = new JTextField();
 		tf_rentDays.setColumns(20);
 		tf_rentDays.setBounds(174, 208, 193, 20);
+		tf_rentDays.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(KeyEvent e) {
+                char key = e.getKeyChar();
+                // "Заглатываем" все пробелы
+                // Тут можно добавить любые проверки
+
+                
+                if (!Character.isDigit(key)) 
+                	e.consume();
+                
+            }
+            public void keyReleased(KeyEvent e){
+            	if (tf_rentDays.getText().length()>0)
+                {
+                	int i = filmComboBox.getSelectedIndex();
+                	double newValue = data.get(i).getRentCost() * 
+                		Integer.parseInt(tf_rentDays.getText());
+                	lbl_Payment.setText(Double.toString(newValue)); 
+                }
+                else{
+                	lbl_Payment.setText("0");
+                }
+            }
+        });
+		
 		contentPanel.add(tf_rentDays);
 
-		JLabel lbl_ExpiresData = new JLabel("ExpiresData");
-		lbl_ExpiresData.setFont(new Font("Tahoma", Font.BOLD, 14));
-		lbl_ExpiresData.setBounds(326, 277, 96, 14);
-		contentPanel.add(lbl_ExpiresData);
-
-		JLabel lbl_Payment = new JLabel("payment");
-		lbl_Payment.setFont(new Font("Tahoma", Font.BOLD, 17));
-		lbl_Payment.setBounds(138, 272, 89, 23);
-		contentPanel.add(lbl_Payment);
+		
 
 		JLabel lblNewLabel = new JLabel("Rent for (days)");
 		lblNewLabel.setBounds(43, 211, 96, 14);
 		contentPanel.add(lblNewLabel);
 
-		JLabel lblNewLabel_1 = new JLabel("Expires at");
-		lblNewLabel_1.setBounds(237, 279, 96, 14);
-		contentPanel.add(lblNewLabel_1);
-
 		JLabel lblNewLabel_2 = new JLabel("To pay");
-		lblNewLabel_2.setBounds(47, 279, 81, 14);
+		lblNewLabel_2.setBounds(89, 290, 81, 14);
 		contentPanel.add(lblNewLabel_2);
 
 		JLabel lblFirstName = new JLabel("First Name");
@@ -185,13 +206,13 @@ public class CreateOrderDialog {
 		
 		if (filmComboBox.getSelectedIndex()<0)
 			 isValid = false;
-		if (tf_firstName.getText() == null || tf_firstName.getText() == "")
+		if (tf_firstName.getText().length()>0)
 			 isValid = false;
-		if (tf_lastName.getText() == null || tf_lastName.getText() == "")
+		if (tf_lastName.getText().length()>0)
 			isValid = false;
-		if (tf_passportNumber.getText() ==null || tf_passportNumber.getText() == "")
+		if (tf_passportNumber.getText().length()>0)
 			isValid = false;
-		if (tf_phoneNumber.getText() == null || tf_phoneNumber.getText() == "")
+		if (tf_phoneNumber.getText().length()>0)
 			isValid = false;
 		try{
 			int i = Integer.parseInt(tf_rentDays.getText());
@@ -215,7 +236,7 @@ public class CreateOrderDialog {
 		vs.FilmName = filmComboBox.getSelectedItem().toString();
 		vs.PassportNumber = tf_passportNumber.getText();
 		vs.PhoneNumber = tf_phoneNumber.getText();
-		
+		vs.CustomerId = 0;
 		int days = Integer.parseInt(tf_rentDays.getText());
 		Date now = new Date();
 		Calendar c = Calendar.getInstance();
@@ -223,7 +244,11 @@ public class CreateOrderDialog {
 		c.add(Calendar.DATE, days);
 		now = c.getTime();
 		vs.RentExpires = now;
-		
 		window.ConfirmCreate(vs);
+	}
+	
+	public void CalculateAmount()
+	{
+		
 	}
 }

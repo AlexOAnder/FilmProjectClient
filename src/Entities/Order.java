@@ -15,7 +15,6 @@ public class Order implements Serializable{
 	private int _employeeId;
 	private Date _created;
 	private Date _rentExpires;
-	private String _phoneNumber;
 	
 
 	private boolean _returned;
@@ -24,7 +23,6 @@ public class Order implements Serializable{
 		
 		_orderId = rs.getInt("OrderId");
 		_filmId = rs.getInt("FilmId");
-		_phoneNumber = rs.getString("PhoneNumber");
 		_customerId = rs.getInt("CustomerId");
 		_employeeId = rs.getInt("EmployeeId");
 		_created = rs.getDate("Created");
@@ -90,14 +88,6 @@ public class Order implements Serializable{
 
 	public void setReturned(boolean returned) {
 		_returned = returned;
-	}
-
-	public String get_phoneNumber() {
-		return _phoneNumber;
-	}
-
-	public void set_phoneNumber(String _phoneNumber) {
-		this._phoneNumber = _phoneNumber;
 	}
 
 }

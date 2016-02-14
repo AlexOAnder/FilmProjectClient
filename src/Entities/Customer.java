@@ -12,6 +12,8 @@ public class Customer extends User implements Serializable{
 	private int _customerId;
 	private String _passportNumber;
 	private int _discount;
+	private String _phoneNumber;
+	public Customer(){}
 	// constructor for the mapping
 	public Customer(ResultSet rs) throws SQLException	{
 		setCustomerId(rs.getInt("CustomerId"));
@@ -19,6 +21,7 @@ public class Customer extends User implements Serializable{
 		setLastName(rs.getString("LastName"));
 		setPassportNumber(rs.getString("PassportNumber"));
 		setDiscount(rs.getInt("Discount"));
+		setPhoneNumber(rs.getString("PhoneNumber"));
 	}
 	@Override
 	public String toString(){
@@ -27,6 +30,7 @@ public class Customer extends User implements Serializable{
 				+" LastName: "+getLastName()+" \n"
 				+" PassportNumber: "+getPassportNumber()+" \n"
 				+" Discount: "+getDiscount()+" \n"
+				+" PhoneNumber: "+getPhoneNumber()+" \n"
 				+"###############################\n";
 		return res;
 	}
@@ -47,5 +51,11 @@ public class Customer extends User implements Serializable{
 	}
 	public void setCustomerId(int customerId) {
 		this._customerId = customerId;
+	}
+	public String getPhoneNumber() {
+		return _phoneNumber;
+	}
+	public void setPhoneNumber(String _phoneNumber) {
+		this._phoneNumber = _phoneNumber;
 	}
 }
