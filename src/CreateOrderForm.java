@@ -28,8 +28,9 @@ import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
 import java.awt.event.InputMethodListener;
 import java.awt.event.InputMethodEvent;
+import java.awt.event.KeyAdapter;
 
-public class CreateOrderDialog {
+public class CreateOrderForm {
 
 	private JFrame frmCreateOrder;
 	private final JPanel contentPanel = new JPanel();
@@ -44,9 +45,14 @@ public class CreateOrderDialog {
 	 * Create the form
 	 * @param window 
 	 */
-	public CreateOrderDialog(List<Film> data, MainWindow window) {
+	public CreateOrderForm(List<Film> data, MainWindow window) {
 		frmCreateOrder = new JFrame();
-
+		frmCreateOrder.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				window.createOrderOpened = false;
+			}
+		});
 		frmCreateOrder.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		frmCreateOrder.setVisible(true);
 		frmCreateOrder.setTitle("Create order");
@@ -78,10 +84,7 @@ public class CreateOrderDialog {
 		tf_rentDays.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(KeyEvent e) {
                 char key = e.getKeyChar();
-                // "Заглатываем" все пробелы
-                // Тут можно добавить любые проверки
-
-                
+                // ignore all no digit
                 if (!Character.isDigit(key)) 
                 	e.consume();
                 
@@ -139,11 +142,28 @@ public class CreateOrderDialog {
 		tf_lastName.setColumns(10);
 
 		tf_passportNumber = new JTextField();
+		tf_passportNumber.addKeyListener(new KeyAdapter() {
+			public void keyTyped(KeyEvent e) {
+                char key = e.getKeyChar();
+                // ignore all no digit
+                if (!Character.isDigit(key)) 
+                	e.consume();
+            }
+		});
 		tf_passportNumber.setBounds(175, 111, 192, 20);
 		contentPanel.add(tf_passportNumber);
 		tf_passportNumber.setColumns(10);
+		
 
 		tf_phoneNumber = new JTextField();
+		tf_phoneNumber.addKeyListener(new KeyAdapter() {
+			public void keyTyped(KeyEvent e) {
+                char key = e.getKeyChar();
+                // ignore all no digit
+                if (!Character.isDigit(key)) 
+                	e.consume();
+            }
+		});
 		tf_phoneNumber.setBounds(175, 149, 192, 20);
 		contentPanel.add(tf_phoneNumber);
 		tf_phoneNumber.setColumns(10);
@@ -206,13 +226,13 @@ public class CreateOrderDialog {
 		
 		if (filmComboBox.getSelectedIndex()<0)
 			 isValid = false;
-		if (tf_firstName.getText().length()>0)
+		if (tf_firstName.getText().length()<=0)
 			 isValid = false;
-		if (tf_lastName.getText().length()>0)
+		if (tf_lastName.getText().length()<=0)
 			isValid = false;
-		if (tf_passportNumber.getText().length()>0)
+		if (tf_passportNumber.getText().length()<=0)
 			isValid = false;
-		if (tf_phoneNumber.getText().length()>0)
+		if (tf_phoneNumber.getText().length()<=0)
 			isValid = false;
 		try{
 			int i = Integer.parseInt(tf_rentDays.getText());
@@ -222,7 +242,7 @@ public class CreateOrderDialog {
 			isValid = false;
 		}
 		if (!isValid){
-			JOptionPane.showMessageDialog(null, "Check yours fields - something wrong!");
+			JOptionPane.showInternalMessageDialog(null, "Check yours fields - something wrong!");
 		}
 		return isValid;
 	}

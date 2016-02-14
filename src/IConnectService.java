@@ -17,4 +17,6 @@ public interface IConnectService extends Remote{
 	public List<CustomOrderView> GetCustomOrderViewList() throws RemoteException;
 	
 	void AddNewCustomOrderView(CustomOrderView order) throws RemoteException;
+	
+	void UpdateOrderStatus(int orderId) throws RemoteException;
 }

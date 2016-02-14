@@ -23,19 +23,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.ActionEvent;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
 public class MainWindow {
 
+	public boolean createOrderOpened = false;
+	public int SelectedOrder = 0; // need for the 'returned' button
 	private static MainWindow window;
 	private JFrame frmFilmprojectMain;
 	private JTable table;
-	private FilmListForm filmListForm = new FilmListForm(); //static form - add data when it will needed
+	private FilmListForm filmListForm = new FilmListForm(); // static form - add
+															// data when it will
+															// needed
 	private List<Film> filmList = new ArrayList<Film>();
 	private List<CustomOrderView> tableDataList = new ArrayList<CustomOrderView>();
-	
+
 	private IConnectService stub;
+
 	/**
 	 * Launch the application.
 	 */
@@ -43,11 +50,10 @@ public class MainWindow {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					
+
 					window = new MainWindow();
 					window.frmFilmprojectMain.setVisible(true);
 
-					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -61,44 +67,45 @@ public class MainWindow {
 	public MainWindow() {
 		GetRmiConnect();
 		initialize();
-		
+
 	}
 
-	
-	public void GetRmiConnect()	{
-		try {
-				stub = (IConnectService) Naming.lookup("ConnectService");
-		        boolean response = stub.GetStatusConnect();
-		        if (response)
-		        	System.out.println("Connect with interface was successfull!");
+	public void LoadData() throws RemoteException {
+		// load main customOrderView for main frame
+		List<CustomOrderView> mainList = stub.GetCustomOrderViewList();
+		if (mainList == null) {
+			JOptionPane.showMessageDialog(null, "RMI предал нас! Нет данных для главной формы");
+			frmFilmprojectMain.dispose();
+		}
+		tableDataList = new ArrayList<CustomOrderView>(mainList);
 
-		        // load main customOrderView for main frame
-		        List<CustomOrderView> mainList = stub.GetCustomOrderViewList();
-		        if (mainList ==null) {
-		        	JOptionPane.showMessageDialog(null, "RMI предал нас! Нет данных для главной формы");
-		        	frmFilmprojectMain.dispose();
-		        }
-		        tableDataList = new ArrayList<CustomOrderView>(mainList);
-		        
-		        // load film's list for the create order and assortiment
-		        List<Film> filmListTmp = stub.GetFilmsList();
-		        if (filmListTmp ==null) {
-	        		JOptionPane.showMessageDialog(null, "RMI предал нас! Фильмы не прогрузились");
-	        		frmFilmprojectMain.dispose();
-	        	}   
-		        else{
-		        	filmList = new ArrayList<Film>(filmListTmp);
-		        }
-		        
+		// load film's list for the create order and assortiment
+		List<Film> filmListTmp = stub.GetFilmsList();
+		if (filmListTmp == null) {
+			JOptionPane.showMessageDialog(null, "RMI предал нас! Фильмы не прогрузились");
+			frmFilmprojectMain.dispose();
+		} else {
+			filmList = new ArrayList<Film>(filmListTmp);
+		}
+	}
+
+	public void GetRmiConnect() {
+		try {
+			stub = (IConnectService) Naming.lookup("ConnectService");
+			boolean response = stub.GetStatusConnect();
+			if (response)
+				System.out.println("Connect with interface was successfull!");
+			LoadData();
+
 		} catch (MalformedURLException | RemoteException | NotBoundException e) {
 			JOptionPane.showMessageDialog(null, "Все плохо!RMI отказался дружить с нами");
 			e.printStackTrace();
 			frmFilmprojectMain.dispose();
 			System.exit(0);
 		}
-		
+
 	}
-	
+
 	/**
 	 * Initialize the contents of the frame.
 	 */
@@ -109,7 +116,7 @@ public class MainWindow {
 		frmFilmprojectMain.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmFilmprojectMain.setResizable(false);
 		frmFilmprojectMain.getContentPane().setLayout(null);
-		
+
 		JButton btnAssortment = new JButton("Assortment");
 		btnAssortment.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -119,34 +126,62 @@ public class MainWindow {
 		});
 		btnAssortment.setBounds(10, 299, 140, 39);
 		frmFilmprojectMain.getContentPane().add(btnAssortment);
-		
+
 		JButton btnNewOrder = new JButton("Add new order");
 		btnNewOrder.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				CreateOrderDialog dialog = new CreateOrderDialog(filmList,window); // that not right, but i think it ok
-				System.out.println("That happened");
+				if (!createOrderOpened) {
+					CreateOrderForm form = new CreateOrderForm(filmList, window); // that
+																					// not
+																					// right,
+																					// but
+																					// i
+																					// think
+																					// it
+																					// ok
+					createOrderOpened = true;
+				}
 			}
 		});
 		btnNewOrder.setBounds(753, 299, 158, 39);
 		frmFilmprojectMain.getContentPane().add(btnNewOrder);
-		
-		
+
 		TableModel model = new MyTableModel(tableDataList);
-		
+
 		table = new JTable(model);
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		table.getTableHeader().setReorderingAllowed(false);
 		table.setFillsViewportHeight(true);
-		
-		JScrollPane scrollPane = new JScrollPane( table );
+		table.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		ListSelectionModel selModel = table.getSelectionModel();
+
+		selModel.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				String result = "";
+				int[] selectedRows = table.getSelectedRows();
+				for (int i = 0; i < selectedRows.length; i++) {
+					int selIndex = selectedRows[i];
+					TableModel model = table.getModel();
+					Object value = model.getValueAt(selIndex, 0); // we are search orderId
+					SelectedOrder = (int)value;
+					System.out.println(SelectedOrder);
+				}
+			}
+		});
+
+		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setBounds(10, 11, 901, 247);
 		frmFilmprojectMain.getContentPane().add(scrollPane);
-		
-		JLabel lblNewLabel = new JLabel("Time");
-		lblNewLabel.setBounds(222, 311, 46, 14);
-		frmFilmprojectMain.getContentPane().add(lblNewLabel);
+
+		JButton btnReturned = new JButton("Returned");
+		btnReturned.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				SetReturnedStatus();
+			}
+		});
+		btnReturned.setBounds(357, 299, 140, 39);
+		frmFilmprojectMain.getContentPane().add(btnReturned);
 	}
-	
-	
+
 	public class MyTableModel extends AbstractTableModel {
 
 		private List<CustomOrderView> rows;
@@ -189,12 +224,11 @@ public class MainWindow {
 				return row.RentExpires;
 			case 7:
 				return row.Returned;
-			case 8:
-			{
+			case 8: {
 				DecimalFormat myFormatter = new DecimalFormat("###,###.###");
 				return myFormatter.format(row.TotalAmount);
 			}
-				
+
 			}
 			return "";
 		}
@@ -228,11 +262,41 @@ public class MainWindow {
 		}
 	}
 
-
-	// method for the adding 
+	// method for the adding new Order
 	public void ConfirmCreate(CustomOrderView model) throws RemoteException {
-		if (stub.GetStatusConnect()){
+		if (stub.GetStatusConnect()) {
 			stub.AddNewCustomOrderView(model);
 		}
+		UpdateData();
+	}
+
+	public void UpdateData() throws RemoteException
+	{
+		LoadData();
+		// update table
+		TableModel tmp = new MyTableModel(tableDataList);
+		table.setModel(tmp);
+	}
+	
+	public void SetReturnedStatus() {
+		try {
+			if (SelectedOrder == 0)
+				return;
+			else
+			{
+				int response = JOptionPane.showConfirmDialog(null,
+						"Are you sure? That operation cannot be canceled!",
+					    "Warning",JOptionPane.YES_NO_OPTION,
+					    JOptionPane.WARNING_MESSAGE);
+			    if (response == JOptionPane.YES_OPTION) {
+			    	stub.UpdateOrderStatus(SelectedOrder);
+					UpdateData();
+			    }
+			}
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "RMI предал нас! Статус не обновлен");
+		}
+
 	}
 }
