@@ -29,6 +29,7 @@ import java.rmi.RemoteException;
 import java.awt.event.InputMethodListener;
 import java.awt.event.InputMethodEvent;
 import java.awt.event.KeyAdapter;
+import javax.swing.DefaultComboBoxModel;
 
 public class CreateOrderForm {
 
@@ -36,6 +37,7 @@ public class CreateOrderForm {
 	private final JPanel contentPanel = new JPanel();
 	private JTextField tf_rentDays;
 	public JComboBox<String> filmComboBox;
+	public JComboBox<String> cb_PassportRegionCode;
 	private JTextField tf_firstName;
 	private JTextField tf_lastName;
 	private JTextField tf_passportNumber;
@@ -56,7 +58,7 @@ public class CreateOrderForm {
 		frmCreateOrder.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		frmCreateOrder.setVisible(true);
 		frmCreateOrder.setTitle("Create order");
-		frmCreateOrder.setBounds(100, 100, 477, 388);
+		frmCreateOrder.setBounds(100, 100, 477, 354);
 		frmCreateOrder.getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		frmCreateOrder.getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -75,7 +77,7 @@ public class CreateOrderForm {
 
 		JLabel lbl_Payment = new JLabel("0");
 		lbl_Payment.setFont(new Font("Tahoma", Font.BOLD, 17));
-		lbl_Payment.setBounds(180, 283, 192, 23);
+		lbl_Payment.setBounds(203, 257, 192, 23);
 		contentPanel.add(lbl_Payment);
 		
 		tf_rentDays = new JTextField();
@@ -112,7 +114,7 @@ public class CreateOrderForm {
 		contentPanel.add(lblNewLabel);
 
 		JLabel lblNewLabel_2 = new JLabel("To pay");
-		lblNewLabel_2.setBounds(89, 290, 81, 14);
+		lblNewLabel_2.setBounds(99, 264, 81, 14);
 		contentPanel.add(lblNewLabel_2);
 
 		JLabel lblFirstName = new JLabel("First Name");
@@ -148,9 +150,12 @@ public class CreateOrderForm {
                 // ignore all no digit
                 if (!Character.isDigit(key)) 
                 	e.consume();
+                // only 7 chars
+                if(tf_passportNumber.getText().length()>6)
+                	e.consume();
             }
 		});
-		tf_passportNumber.setBounds(175, 111, 192, 20);
+		tf_passportNumber.setBounds(245, 111, 122, 20);
 		contentPanel.add(tf_passportNumber);
 		tf_passportNumber.setColumns(10);
 		
@@ -167,6 +172,13 @@ public class CreateOrderForm {
 		tf_phoneNumber.setBounds(175, 149, 192, 20);
 		contentPanel.add(tf_phoneNumber);
 		tf_phoneNumber.setColumns(10);
+		
+		cb_PassportRegionCode = new JComboBox<String>();
+		cb_PassportRegionCode.setModel(
+				new DefaultComboBoxModel<String>(new String[] 
+						{"MP", "KH", "AB", "BM", "HB", "KH", "MC", "KB"}));
+		cb_PassportRegionCode.setBounds(175, 111, 60, 20);
+		contentPanel.add(cb_PassportRegionCode);
 
 		JPanel buttonPane = new JPanel();
 		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -181,11 +193,13 @@ public class CreateOrderForm {
 							CreateOrder(window);
 							JOptionPane.showMessageDialog(null, "Create order succeed");
 							frmCreateOrder.dispose();
+							window.createOrderOpened = false;
 						}
 					}
 				 catch (RemoteException e1) {
 					e1.printStackTrace();
-					JOptionPane.showMessageDialog(null, "Something wrong with create order");
+					JOptionPane.showMessageDialog(null, "Something wrong with create order's"
+							+ " method.Contact with administrator","Critical Error",JOptionPane.ERROR_MESSAGE);
 				}
 				
 			}
@@ -242,7 +256,7 @@ public class CreateOrderForm {
 			isValid = false;
 		}
 		if (!isValid){
-			JOptionPane.showInternalMessageDialog(null, "Check yours fields - something wrong!");
+			JOptionPane.showMessageDialog(null, "Check yours fields - something wrong!","Validation Error",JOptionPane.WARNING_MESSAGE);
 		}
 		return isValid;
 	}
@@ -254,7 +268,8 @@ public class CreateOrderForm {
 		vs.CustomerFirstName = tf_firstName.getText();
 		vs.CustomerLastName = tf_lastName.getText();
 		vs.FilmName = filmComboBox.getSelectedItem().toString();
-		vs.PassportNumber = tf_passportNumber.getText();
+		vs.PassportNumber = cb_PassportRegionCode.getSelectedItem().toString() 
+				+ tf_passportNumber.getText();
 		vs.PhoneNumber = tf_phoneNumber.getText();
 		vs.CustomerId = 0;
 		int days = Integer.parseInt(tf_rentDays.getText());
